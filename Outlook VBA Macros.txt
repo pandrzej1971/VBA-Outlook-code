@@ -1,0 +1,1011 @@
+ Dim DelayedDeliveryFlag As Boolean
+ Dim ActiveSendAsAlias As String
+ 
+
+
+Private Sub Application_ItemSend(ByVal Item As Object, Cancel As Boolean)
+Item.DeferredDeliveryTime = Now + 1 / 24 / 60
+
+If DelayedDeliveryFlag Then Item.DeferredDeliveryTime = Now + 1
+If ActiveSendAsAlias <> "pandrzej@cisco.com" Then Item.SentOnBehalfOfName = ActiveSendAsAlias
+
+End Sub
+
+Private Sub Application_Startup()
+
+DelayedDeliveryFlag = False
+ActiveSendAsAlias = "pandrzej@cisco.com"
+
+End Sub
+Sub SetCiscoPartnerSalesAcademyAsActive()
+ActiveSendAsAlias = "cisco-partner-sales-academy@cisco.com"
+MsgBox ("Active alias:" & ActiveSendAsAlias)
+
+End Sub
+
+Sub SetSnapAsActive()
+ActiveSendAsAlias = "snap@cisco.com"
+MsgBox ("Active alias:" & ActiveSendAsAlias)
+End Sub
+
+Sub SetDefaultAsActive()
+ActiveSendAsAlias = "pandrzej@cisco.com"
+MsgBox ("Active alias:" & ActiveSendAsAlias)
+End Sub
+
+Sub SwitchDelayedDeliveryFlag()
+DelayedDeliveryFlag = Not DelayedDeliveryFlag
+
+If DelayedDeliveryFlag Then
+  MsgBox ("Messages delivered with a delay of 1 day")
+Else
+    MsgBox ("Messages delivered after one minute from sending")
+End If
+
+
+
+End Sub
+
+
+
+
+Public Sub HowManyEmails()
+
+  Dim objSelection As Outlook.Selection
+    Set objSelection = Application.ActiveExplorer.Selection
+    
+    MsgBox ("Number of selected items: " & objSelection.Count)
+    
+   
+    
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail As Outlook.MailItem
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+ For x = 1 To myOlSel.Count
+    If myOlSel.Item(x).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(x)
+        
+        oMail.Display
+        oMail.Send
+ 
+    End If
+ Next x
+ 
+ MsgBox MsgTxt
+ 
+End Sub
+
+Public Function findAddachmentPath(msgBody As String) As String
+Dim FirstPosition, LastPosition As Long
+Dim TempText As String
+
+FirstPosition = InStr(1, msgBody, "Att:")
+
+
+
+TempText = Right(msgBody, Len(msgBody) - FirstPosition - 3)
+
+LastPosition = InStr(1, TempText, ".")
+
+TempText = Left(TempText, LastPosition + 4)
+
+TempText = "C:\Users\pandrzej\Desktop\Partner Sales Academy\RBD Mailing\RBD Mailing APJ FY17Q2\QTD APJ Level 5 6 7 no level 8\" & TempText ' blank string shows the path
+
+findAddachmentPath = TempText
+
+
+End Function
+
+Public Sub Send_with_attachment()
+
+  Dim objSelection As Outlook.Selection
+  Dim StrAttachmentPath As String
+  
+    Set objSelection = Application.ActiveExplorer.Selection
+    
+    MsgBox ("Number of selected items: " & objSelection.Count & vbNewLine & CurDir())
+    
+   
+    
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail As Outlook.MailItem
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+ For x = 1 To myOlSel.Count
+    If myOlSel.Item(x).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(x)
+        StrAttachmentPath = findAddachmentPath(oMail.Body)
+        
+        
+        oMail.Attachments.Add (StrAttachmentPath)
+        
+        'oMail.Display
+        oMail.Save
+        
+        oMail.Send
+        
+ 
+    End If
+ Next x
+ 
+ MsgBox ("Sending with Attachment Complete")
+ 
+End Sub
+Public Function findCCRecipients(msgBody As String) As String
+Dim FirstPosition, LastPosition As Long
+Dim TempText As String
+
+FirstPosition = InStr(1, msgBody, "CC:")
+
+
+
+TempText = Right(msgBody, Len(msgBody) - FirstPosition - 2)
+
+LastPosition = InStr(1, TempText, vbNewLine)
+
+TempText = Left(TempText, LastPosition)
+
+findCCRecipients = TempText
+'MsgBox (TempText)
+
+End Function
+Public Sub Send_with_CC()
+
+  Dim objSelection As Outlook.Selection
+  Dim StrCC As String
+  
+    Set objSelection = Application.ActiveExplorer.Selection
+    
+    MsgBox ("Number of selected items: " & objSelection.Count)
+    
+   
+    
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail As Outlook.MailItem
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+ For x = 1 To myOlSel.Count
+    If myOlSel.Item(x).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(x)
+        StrCC = findCCRecipients(oMail.Body)
+        
+        
+        oMail.CC = StrCC
+        
+        'oMail.Display
+        
+        oMail.Send
+        
+ 
+    End If
+ Next x
+ 
+ MsgBox "Thank you. It seems to be done."
+ 
+End Sub
+
+Public Sub ForwardAndReplyToSnapEmail()
+
+  Dim objSelection As Outlook.Selection
+    Set objSelection = Application.ActiveExplorer.Selection
+     
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail As Outlook.MailItem
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+     If myOlSel.Item(1).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(1).Forward
+        oMail.Subject = "Materials from today's meeting - FW:" & myOlSel.Item(1).Subject
+        oMail.To = myOlSel.Item(1).To
+        
+        MsgTxt = "Hi " & Left(myOlSel.Item(1).To, InStr(1, oMail.To, " ")) & "," & "<br><br>"
+        MsgTxt = MsgTxt & "It was very nice to meet you virtually today." & "<br>"
+        MsgTxt = MsgTxt & "Please find below links discussed during our call." & "<br><br>"
+        MsgTxt = MsgTxt & "Please do not hesitate to reach out to me if you have any questions." & "<br>"
+        MsgTxt = MsgTxt & "At the bottom of this message you will find initial email with all the training resources discussed." & "<br><br>"
+        
+        MsgTxt = MsgTxt & "Best regards" & "<br>"
+        MsgTxt = MsgTxt & "Pawel" & "<br>"
+
+        oMail.HTMLBody = MsgTxt & oMail.HTMLBody
+        
+        oMail.Display
+        
+ 
+    End If
+  
+ MsgBox "Please customize the message."
+ 
+End Sub
+Function GetValueOfCSAT(WhatWeLookFor As String, BodyOfMessage As String) As String
+Dim StartPos As Integer
+Dim RightLeftover As String
+
+GetValueOfCSAT = "N/A"
+
+StartPos = InStr(1, BodyOfMessage, WhatWeLookFor, vbTextCompare)
+If StartPos = 0 Then Exit Function
+
+RightLeftover = Right(BodyOfMessage, Len(BodyOfMessage) - StartPos + 1)
+StartPos = InStr(1, RightLeftover, "</tr>", vbTextCompare)
+
+
+GetValueOfCSAT = Left(RightLeftover, StartPos - 1)
+End Function
+
+
+Function GetValueOfQuestion(WhatWeLookFor As String, BodyOfMessage As String, ColumnNumber As Integer) As String
+ Dim StartPos, EndPos As Long
+ Dim RightLeftover As String
+ Dim i As Integer
+ 
+'Do Until StartPos = 2
+ ' RightLEftover = Left(BodyOfMessage, 1024)
+ ' StartPos = MsgBox(RightLEftover, vbOKCancel)
+ ' BodyOfMessage = Right(BodyOfMessage, Len(BodyOfMessage) - 1024)
+'Loop
+GetValueOfQuestion = "N/A"
+
+ StartPos = InStr(1, BodyOfMessage, WhatWeLookFor, vbTextCompare)
+ 
+' MsgBox (StartPos)
+If StartPos = 0 Then Exit Function
+
+RightLeftover = Right(BodyOfMessage, Len(BodyOfMessage) - StartPos + 1) ' get the table
+EndPos = InStr(1, RightLeftover, "</table", vbTextCompare)
+RightLeftover = Left(RightLeftover, EndPos)
+
+StartPos = InStr(1, RightLeftover, "<tfoot>", vbTextCompare)
+'MsgBox (StartPos)
+
+RightLeftover = Right(RightLeftover, Len(RightLeftover) - StartPos + 1) ' get the footer of the table
+'MsgBox (Len(RightLeftover))
+
+'MsgBox (RightLeftover)
+For i = 0 To ColumnNumber
+    StartPos = InStr(1, RightLeftover, "</td>", vbTextCompare) ' remove number of lines
+    RightLeftover = Right(RightLeftover, Len(RightLeftover) - StartPos - 5)
+Next i
+
+StartPos = InStr(1, RightLeftover, ">", vbTextCompare)
+RightLeftover = Right(RightLeftover, Len(RightLeftover) - StartPos + 1)
+
+StartPos = InStr(1, RightLeftover, "</td>", vbTextCompare)
+RightLeftover = Left(RightLeftover, StartPos - 1)
+RightLeftover = Right(RightLeftover, Len(RightLeftover) - 1)
+
+'Debug.Print "____________________"
+
+'Debug.Print RightLeftover
+
+GetValueOfQuestion = RightLeftover
+End Function
+Public Sub Generate_MTM_Summary()
+
+  Dim objSelection As Outlook.Selection
+  Dim StrCC As String
+  
+    Set objSelection = Application.ActiveExplorer.Selection
+    
+    MsgBox ("Number of selected items: " & objSelection.Count)
+    
+   
+    
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail, oSummaryMail As Outlook.MailItem
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+ Set oSummaryMail = Application.CreateItem(olMailItem)
+ oSummaryMail.HTMLBody = "<table>"
+ For x = 1 To myOlSel.Count
+    If myOlSel.Item(x).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(x)
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "01." & GetValueOfCSAT("Class Average", oMail.HTMLBody) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>"
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & GetValueOfCSAT("N Count", oMail.HTMLBody) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>"
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "Report Date" & "</td>" & "<td>" & Format(oMail.ReceivedTime, "dd-mm-yyyy") & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>"
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "02.Organized & Logical" & "</td>" & "<td>" & GetValueOfQuestion("The training module was clearly organized and logical", oMail.HTMLBody, 0) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" 'The training module was clearly organized and logical
+ 
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "03.Exercises" & "</td>" & "<td>" & GetValueOfQuestion("The exercises were effective in reinforcing my learning", oMail.HTMLBody, 1) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" 'The exercises were effective in reinforcing my learning
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "05.Pace" & "</td>" & "<td>" & GetValueOfQuestion("The pace of the training session in this Module was", oMail.HTMLBody, 3) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' The pace of the training session in this Module was:
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "04.Facilitator effectiveness" & "</td>" & "<td>" & GetValueOfQuestion("The facilitator was engaging and stimulated interest in the learning material", oMail.HTMLBody, 0) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" 'The facilitator was engaging and stimulated interest in the learning material"
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "06.Technology" & "</td>" & "<td>" & GetValueOfQuestion("The technology used to deliver this Module was reliable and added positively to the learning experience", oMail.HTMLBody, 0) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' The technology used to deliver this Module was reliable and added positively to the learning experience (TP, WebEx,Moodle, other)"
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "07.Course Design" & "</td>" & "<td>" & GetValueOfQuestion("Student", oMail.HTMLBody, 0) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' Course Design
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "08.Overall Satisfaction" & "</td>" & "<td>" & GetValueOfQuestion("Student", oMail.HTMLBody, 1) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' Overall Satisfaction
+
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "09.Training Delivery" & "</td>" & "<td>" & GetValueOfQuestion("Student", oMail.HTMLBody, 2) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' Training Delivery
+
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & "10.Technology Management" & "</td>" & "<td>" & GetValueOfQuestion("Student", oMail.HTMLBody, 3) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>"  ' Technology Management
+
+
+    End If
+ Next x
+ 
+ oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "</table>"
+ oSummaryMail.Display
+ 
+End Sub
+
+Public Sub AcceptThisInvitation(currentInvite As Outlook.MailItem)
+
+MsgBox (TypeName(currentInvite))
+
+End Sub
+
+
+
+
+Public Sub Auto_Accept_Selected_Items()
+
+  Dim objSelection As Outlook.Selection
+  Dim StrCC As String
+  
+    Set objSelection = Application.ActiveExplorer.Selection
+    
+    MsgBox ("Number of selected items: " & objSelection.Count & vbNewLine & "Invitations will be accepted")
+    
+   
+    
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail As Object
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+  For x = 1 To myOlSel.Count
+    If myOlSel.Item(x).Class = 53 Then
+    
+        
+        Set oMail = myOlSel.Item(x)
+        MsgBox (TypeName(oMail))
+                       
+ 
+    End If
+ Next x
+ 
+End Sub
+
+Sub SaveMessageAsPDF()
+      
+    Dim Selection As Selection
+    Dim obj As Object
+    Dim Item As MailItem
+      
+  
+    Dim wrdApp As Word.Application
+    Dim wrdDoc As Word.Document
+    Set wrdApp = CreateObject("Word.Application")
+    Set Selection = Application.ActiveExplorer.Selection
+ 
+For Each obj In Selection
+  
+    Set Item = obj
+     
+    Dim FSO As Object, TmpFolder As Object
+    Dim sName As String
+    Set FSO = CreateObject("Scripting.FileSystemObject")
+    Set tmpFileName = FSO.GetSpecialFolder(2)
+     
+    sName = Item.To
+    ReplaceCharsForFileName sName, "-"
+    tmpFileName = tmpFileName & "\" & sName & ".mht"
+    'MsgBox (tmpFileName)
+    
+    Item.SaveAs tmpFileName, olMHTML
+     
+     
+Set wrdDoc = wrdApp.Documents.Open(FileName:=tmpFileName, Visible:=True)
+   
+    Dim WshShell As Object
+    Dim SpecialPath As String
+    Dim strToSaveAs As String
+    Set WshShell = CreateObject("WScript.Shell")
+    MyDocs = WshShell.SpecialFolders(16)
+        
+strToSaveAs = MyDocs & "\" & sName & ".pdf"
+  
+' check for duplicate filenames
+' if matched, add the current time to the file name
+If FSO.FileExists(strToSaveAs) Then
+   sName = sName & Format(Now, "hhmmss")
+   strToSaveAs = MyDocs & "\" & sName & ".pdf"
+End If
+   
+wrdApp.ActiveDocument.ExportAsFixedFormat OutputFileName:= _
+    strToSaveAs, ExportFormat:=wdExportFormatPDF, _
+    OpenAfterExport:=False, OptimizeFor:=wdExportOptimizeForPrint, _
+    Range:=wdExportFromTo, From:=2, To:=10, Item:= _
+    wdExportDocumentContent, IncludeDocProps:=True, KeepIRM:=True, _
+    CreateBookmarks:=wdExportCreateNoBookmarks, DocStructureTags:=True, _
+    BitmapMissingFonts:=True, UseISO19005_1:=False
+              
+     
+ 
+Next obj
+    wrdDoc.Close
+    wrdApp.Quit
+    Set wrdDoc = Nothing
+    Set wrdApp = Nothing
+    Set WshShell = Nothing
+    Set obj = Nothing
+    Set Selection = Nothing
+    Set Item = Nothing
+  
+End Sub
+  
+' This function removes invalid and other characters from file names
+Private Sub ReplaceCharsForFileName(sName As String, sChr As String)
+  sName = Replace(sName, "/", sChr)
+  sName = Replace(sName, "\", sChr)
+  sName = Replace(sName, ":", sChr)
+  sName = Replace(sName, "?", sChr)
+  sName = Replace(sName, Chr(34), sChr)
+  sName = Replace(sName, "<", sChr)
+  sName = Replace(sName, ">", sChr)
+  sName = Replace(sName, "|", sChr)
+  sName = Replace(sName, "&", sChr)
+  sName = Replace(sName, "%", sChr)
+  sName = Replace(sName, "*", sChr)
+  sName = Replace(sName, " ", sChr)
+  sName = Replace(sName, "{", sChr)
+  sName = Replace(sName, "[", sChr)
+  sName = Replace(sName, "]", sChr)
+  sName = Replace(sName, "}", sChr)
+  sName = Replace(sName, "!", sChr)
+  sName = Replace(sName, "'", sChr)
+End Sub
+
+Public Sub RemindAboutActionFromEmail()
+
+  Dim objSelection As Outlook.Selection
+    Set objSelection = Application.ActiveExplorer.Selection
+     
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail As Outlook.MailItem
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+     If myOlSel.Item(1).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(1).Reply
+        oMail.Subject = "REMINDER ACTION REQUIRED - FW:" & myOlSel.Item(1).Subject
+        oMail.To = myOlSel.Item(1).To
+        oMail.CC = myOlSel.Item(1).CC
+        oMail.Importance = olImportanceHigh
+
+        MsgTxt = "Hi " & Left(myOlSel.Item(1).To, InStr(1, oMail.To, " ")) & "," & "<br><br>"
+        MsgTxt = MsgTxt & "We have not seen your response to requested action in the message below." & "<br>"
+        MsgTxt = MsgTxt & "Please complete this task as soon as possible." & "<br><br>"
+        
+        MsgTxt = MsgTxt & "Best regards" & "<br>"
+        MsgTxt = MsgTxt & "Pawel" & "<br>"
+
+        oMail.HTMLBody = MsgTxt & oMail.HTMLBody
+        
+        oMail.Display
+        
+ 
+    End If
+  
+End Sub
+Function GetStudents(WhatWeLookFor As String, BodyOfMessage As String, ColumnNumber As Integer) As String
+ Dim StartPos, EndPos As Long
+ Dim RightLeftover As String
+ Dim i As Integer
+ 
+'Do Until StartPos = 2
+ ' RightLEftover = Left(BodyOfMessage, 1024)
+ ' StartPos = MsgBox(RightLEftover, vbOKCancel)
+ ' BodyOfMessage = Right(BodyOfMessage, Len(BodyOfMessage) - 1024)
+'Loop
+GetStudents = "N/A"
+
+ StartPos = InStr(1, BodyOfMessage, WhatWeLookFor, vbTextCompare)
+ 
+' MsgBox (StartPos)
+If StartPos = 0 Then Exit Function
+
+RightLeftover = Right(BodyOfMessage, Len(BodyOfMessage) - StartPos + 1) ' get the table
+EndPos = InStr(1, RightLeftover, "</tbody>", vbTextCompare)
+RightLeftover = Left(RightLeftover, EndPos)
+
+'Debug.Print RightLeftover
+
+'StartPos = InStr(1, RightLeftover, "<tfoot>", vbTextCompare)
+'MsgBox (StartPos)
+
+'RightLeftover = Right(RightLeftover, Len(RightLeftover) - StartPos + 1) ' get the footer of the table
+'MsgBox (Len(RightLeftover))
+
+'MsgBox (RightLeftover)
+'For i = 0 To ColumnNumber
+  '  StartPos = InStr(1, RightLeftover, "</td>", vbTextCompare) ' remove number of lines
+   ' RightLeftover = Right(RightLeftover, Len(RightLeftover) - StartPos - 5)
+'Next i
+
+'StartPos = InStr(1, RightLeftover, ">", vbTextCompare)
+'RightLeftover = Right(RightLeftover, Len(RightLeftover) - StartPos + 1)
+
+'StartPos = InStr(1, RightLeftover, "</td>", vbTextCompare)
+'RightLeftover = Left(RightLeftover, StartPos - 1)
+'RightLeftover = Right(RightLeftover, Len(RightLeftover) - 1)
+
+'Debug.Print "____________________"
+
+'Debug.Print RightLeftover
+
+GetStudents = RightLeftover
+End Function
+
+Public Sub Generate_MTM_Respondents_Summary()
+
+    Dim objSelection As Outlook.Selection
+    Dim StrCC, NCountValueHTML As String
+  
+    Dim myOlExp As Outlook.Explorer
+    Dim myOlSel As Outlook.Selection
+    
+    Dim oMail, oSummaryMail As Outlook.MailItem
+    
+    Dim MsgTxt, LeadingHTML, rawHTMLwithStudents As String
+    Dim x As Long
+    
+ Set objSelection = Application.ActiveExplorer.Selection
+    
+ MsgBox ("Number of selected items: " & objSelection.Count)
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+ Set oSummaryMail = Application.CreateItem(olMailItem)
+ oSummaryMail.HTMLBody = "<table>"
+ 
+ For x = 1 To myOlSel.Count
+    If myOlSel.Item(x).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(x)
+        
+        NCountValueHTML = GetValueOfCSAT("N Count", oMail.HTMLBody)
+        If NCountValueHTML = "N/A" Then NCountValueHTML = "N Count </td><td> N/A"
+        LeadingHTML = "<tr><td>" & Str(x) & "</td><td>" & oMail.Subject & "</td><td>" & Format(oMail.ReceivedTime, "dd-mm-yyyy") & "</td><td>" & NCountValueHTML & "</td>"
+        rawHTMLwithStudents = GetStudents("Student", oMail.HTMLBody, 3)
+        rawHTMLwithStudents = Replace(rawHTMLwithStudents, "<tr bgcolor=" & Chr(34) & "#E8E8E8" & Chr(34) & ">", "_XXX_Temporary_Marker_XXX")
+        rawHTMLwithStudents = Replace(rawHTMLwithStudents, "<tr bgcolor=" & Chr(34) & Chr(34) & ">", "_XXX_Temporary_Marker_XXX")
+        
+        rawHTMLwithStudents = Right(rawHTMLwithStudents, Len(rawHTMLwithStudents) - InStr(1, rawHTMLwithStudents, "</thead>", vbTextCompare) - 7)
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & Replace(rawHTMLwithStudents, "_XXX_Temporary_Marker_XXX", LeadingHTML)  ' Class specification
+        
+        'Debug.Print rawHTMLwithStudents
+        
+    End If
+ Next x
+ 
+ oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "</table>"
+ oSummaryMail.Display
+ 
+End Sub
+
+'Private Declare Function ShellExecute Lib "shell32.dll" Alias _
+ ' "ShellExecuteA" (ByVal hwnd As Long, ByVal lpOperation As String, _
+  'ByVal lpFile As String, ByVal lpParameters As String, _
+  'ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+
+Private Sub delayVBA(intNrOfSeconds As Integer)
+ Dim varStart As Variant
+ 
+ varStart = Timer
+  Do While Timer < varStart + intNrOfSeconds
+  Loop
+End Sub
+
+Private Function GetCSATValueFromText(HTMLText, WhatWeLookFor As String) As String
+Dim StartPos, EndPos As Long
+ Dim RightLeftover As String
+ Dim i, ColumnNumber As Integer
+ 
+If WhatWeLookFor = "02." Then
+        WhatWeLookFor = "The training module was"
+        ColumnNumber = 1
+End If
+
+
+If WhatWeLookFor = "03." Then
+        WhatWeLookFor = "The exercises were"
+        ColumnNumber = 2
+End If
+
+If WhatWeLookFor = "05." Then
+        WhatWeLookFor = "The pace of the training"
+        ColumnNumber = 4
+End If
+
+If WhatWeLookFor = "04." Then
+        WhatWeLookFor = "The facilitator was"
+        ColumnNumber = 1
+End If
+
+If WhatWeLookFor = "06." Then
+        WhatWeLookFor = "The technology used to"
+        ColumnNumber = 1
+End If
+
+
+GetCSATValueFromText = "N/A"
+
+StartPos = InStr(1, HTMLText, WhatWeLookFor, vbTextCompare)
+ 
+' MsgBox (StartPos)
+If StartPos = 0 Then Exit Function
+
+RightLeftover = Right(HTMLText, Len(HTMLText) - StartPos + 1) ' get the table
+'Debug.Print RightLeftover
+
+
+StartPos = InStr(1, RightLeftover, "Average ", vbTextCompare)
+
+RightLeftover = Right(RightLeftover, Len(RightLeftover) - StartPos + 1) ' get the table
+
+EndPos = InStr(1, RightLeftover, "<BR>", vbTextCompare)
+
+RightLeftover = Left(RightLeftover, EndPos - 1)
+
+For i = 0 To ColumnNumber - 1
+    StartPos = InStr(1, RightLeftover, " ", vbTextCompare) ' remove number of lines
+    RightLeftover = Right(RightLeftover, Len(RightLeftover) - StartPos)
+Next i
+
+StartPos = InStr(1, RightLeftover, " ", vbTextCompare)
+RightLeftover = Left(RightLeftover, StartPos)
+
+StartPos = InStr(1, RightLeftover, " ", vbTextCompare)
+RightLeftover = Left(RightLeftover, StartPos - 1)
+
+GetCSATValueFromText = RightLeftover
+
+End Function
+
+
+Public Sub Generate_MTM_Summary_From_Emails_With_PDF_Attachment()
+    
+    Dim Path As String
+    Dim xVariant As Variant
+    
+    Dim objSelection As Outlook.Selection
+    Dim StrCC, NCountValueHTML, AttachmentPath As String
+  
+    Dim myOlExp As Outlook.Explorer
+    Dim myOlSel As Outlook.Selection
+    
+    Dim oMail, oSummaryMail As Outlook.MailItem
+    
+    Dim MsgTxt, LeadingHTML, HTMLsummaryBuffer As String
+    Dim x As Long
+    
+    Dim myShell As Object
+
+    Set myShell = CreateObject("WScript.Shell")
+    
+    HTMLsummaryBuffer = ""
+    
+ Set objSelection = Application.ActiveExplorer.Selection
+    
+ MsgBox ("Number of selected items: " & objSelection.Count)
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+ Set oSummaryMail = Application.CreateItem(olMailItem)
+ 
+ oSummaryMail.BodyFormat = olFormatPlain
+ 
+ For x = 1 To myOlSel.Count
+    If myOlSel.Item(x).Class = OlObjectClass.olMail Then
+        
+        oSummaryMail.BodyFormat = olFormatPlain
+        
+        Set oMail = myOlSel.Item(x)
+        
+        'MsgBox (oMail.Attachments.Item(1).FileName)
+        AttachmentPath = "C:\Temp\" & oMail.Attachments.Item(1).FileName
+        oMail.Attachments(1).SaveAsFile AttachmentPath
+        
+            ' Set the Path variable equal to the path of your program's installation
+        Path = "C:\Program Files (x86)\Adobe\Reader 11.0\Reader\AcroRd32.exe " & AttachmentPath
+
+        xVariant = Shell(Path, vbNormalFocus)
+        Call delayVBA(1)
+        
+            
+        SendKeys "%E", True
+         
+         Call delayVBA(1)
+         
+         SendKeys "L", True
+         
+         Call delayVBA(1)
+         
+         SendKeys "%E", True
+         SendKeys "C", True
+         Call delayVBA(1)
+         
+         SendKeys "%F", True
+         SendKeys "x", True
+         
+         oSummaryMail.Display
+         Call delayVBA(1)
+         
+         SendKeys "{TAB}{TAB}{TAB}{TAB}{TAB}"
+         Call delayVBA(1)
+         
+         SendKeys "^v", True
+         
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "01." & GetValueOfCSAT("Class Average", oMail.HTMLBody) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>"
+        
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & GetValueOfCSAT("N Count", oMail.HTMLBody) & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>"
+        
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "Report Date" & "</td>" & "<td>" & Format(oMail.ReceivedTime, "dd-mm-yyyy") & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>"
+        
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "02.Organized & Logical" & "</td>" & "<td>" & GetCSATValueFromText(oSummaryMail.HTMLBody, "02.") & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" 'The training module was clearly organized and logical
+ 
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "03.Exercises" & "</td>" & "<td>" & GetCSATValueFromText(oSummaryMail.HTMLBody, "03.") & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" 'The exercises were effective in reinforcing my learning
+        
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "05.Pace" & "</td>" & "<td>" & GetCSATValueFromText(oSummaryMail.HTMLBody, "05.") & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' The pace of the training session in this Module was:
+        
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "04.Facilitator effectiveness" & "</td>" & "<td>" & GetCSATValueFromText(oSummaryMail.HTMLBody, "04.") & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>"  'The facilitator was engaging and stimulated interest in the learning material"
+        
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "06.Technology" & "</td>" & "<td>" & GetCSATValueFromText(oSummaryMail.HTMLBody, "06.") & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' The technology used to deliver this Module was reliable and added positively to the learning experience (TP, WebEx,Moodle, other)"
+        
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "07.Course Design" & "</td>" & "<td>" & " ? " & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' Course Design
+        
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "08.Overall Satisfaction" & "</td>" & "<td>" & " ? " & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' Overall Satisfaction
+
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "09.Training Delivery" & "</td>" & "<td>" & " ? " & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>" ' Training Delivery
+
+        HTMLsummaryBuffer = HTMLsummaryBuffer & "<tr>" & "<td>" & "10.Technology Management" & "</td>" & "<td>" & " ? " & "</td>" & "<td>" & oMail.Subject & "</td>" & "</tr>"  ' Technology Management
+          
+        oSummaryMail.HTMLBody = ""
+        
+    End If
+ Next x
+ 
+ oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<table>"
+ 
+ oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & HTMLsummaryBuffer
+ 
+ oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "</table>"
+ oSummaryMail.Display
+ 
+End Sub
+
+Function GetValueOfField(WhatWeLookFor As String, BodyOfMessage As String, TerminationStr As String) As String
+Dim StartPos As Integer
+Dim RightLeftover As String
+
+GetValueOfField = "N/A"
+
+StartPos = InStr(1, BodyOfMessage, WhatWeLookFor, vbTextCompare)
+If StartPos = 0 Then Exit Function
+
+RightLeftover = Right(BodyOfMessage, Len(BodyOfMessage) - StartPos + 1)
+StartPos = InStr(1, RightLeftover, TerminationStr, vbTextCompare)
+
+Debug.Print "____________________"
+
+Debug.Print RightLeftover
+
+RightLeftover = Left(RightLeftover, StartPos - 1)
+
+GetValueOfField = Replace(RightLeftover, WhatWeLookFor, "")
+End Function
+
+Public Sub Get_Cridentials_From_Action_Email()
+MsgBox "This will get CEC cridentials from selected messages - ACTION REQUIRED"
+
+  Dim objSelection As Outlook.Selection
+  Dim StrCC As String
+  
+    Set objSelection = Application.ActiveExplorer.Selection
+    
+    MsgBox ("Number of selected items: " & objSelection.Count)
+    
+   
+    
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail, oSummaryMail As Outlook.MailItem
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+ Set oSummaryMail = Application.CreateItem(olMailItem)
+ oSummaryMail.HTMLBody = "<table>"
+ For x = 1 To myOlSel.Count
+    If myOlSel.Item(x).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(x)
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & GetValueOfField("Your username:", oMail.HTMLBody, "<BR>") & "</td>" & "<td>" & GetValueOfField("Your password:", oMail.HTMLBody, "<BR>") & "</td>" & "</tr>"
+                     
+        
+    End If
+ Next x
+ 
+ oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "</table>"
+ oSummaryMail.Display
+
+End Sub
+
+Public Sub Get_Cridentials_From_Hiring_Email()
+MsgBox "this will get CEC userid from selected messages - Hiring Notification"
+
+ Dim objSelection As Outlook.Selection
+  Dim StrCC As String
+  
+    Set objSelection = Application.ActiveExplorer.Selection
+    
+    MsgBox ("Number of selected items: " & objSelection.Count)
+    
+   
+    
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail, oSummaryMail As Outlook.MailItem
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+ Set oSummaryMail = Application.CreateItem(olMailItem)
+ oSummaryMail.HTMLBody = "<table>"
+ For x = 1 To myOlSel.Count
+    If myOlSel.Item(x).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(x)
+        
+        oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "<tr>" & "<td>" & GetValueOfField("Cisco Userid: ", oMail.HTMLBody, "<BR>") & "</td>" & "<td>" & GetValueOfField("Avature Person ID:", oMail.HTMLBody, "</div>") & "</td>" & "</tr>"
+        
+        
+               
+        
+    End If
+ Next x
+ 
+ oSummaryMail.HTMLBody = oSummaryMail.HTMLBody & "</table>"
+ oSummaryMail.Display
+
+End Sub
+
+
+Public Sub ReplyToQTPInacurracyIssue()
+
+  Dim objSelection As Outlook.Selection
+    Set objSelection = Application.ActiveExplorer.Selection
+     
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ 
+ Dim oMail As Outlook.MailItem
+ 
+ Dim MsgTxt As String
+ Dim x As Long
+ 
+  
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+ 
+     If myOlSel.Item(1).Class = OlObjectClass.olMail Then
+    
+        ' For mail item, use the SenderName property.
+        Set oMail = myOlSel.Item(1).ReplyAll
+        oMail.Subject = "RE:" & myOlSel.Item(1).Subject
+        oMail.To = myOlSel.Item(1).Sender
+        oMail.CC = myOlSel.Item(1).CC & ";" & myOlSel.Item(1).To
+        
+        MsgTxt = "Hi " & Left(myOlSel.Item(1).Sender, InStr(1, oMail.To, " ")) & "," & "<br><br>"
+        
+        MsgTxt = MsgTxt & "Thank you for your message." & "<br>"
+        MsgTxt = MsgTxt & "We are aware of this issue and it has been reported to IT support." & "<br><br>"
+        
+        MsgTxt = MsgTxt & "IT is working on the resolution to this issue." & "<br>"
+        MsgTxt = MsgTxt & "This bug resulted in removing item 'Programmability and APIs ...' from reporting system and as such all learners defaulted to 'Not Started' status." & "<br>"
+        MsgTxt = MsgTxt & "This is Sales Connect reporting issue related to this particular item. <br><br>"
+        
+        MsgTxt = MsgTxt & "We apologize for the inconvenience and are working hard with the Sales Connect team to fix this bug. <br>"
+        MsgTxt = MsgTxt & "Other items in Q4 QTP program should work fine. <br><br>"
+        MsgTxt = MsgTxt & "Best regards" & "<br>"
+        MsgTxt = MsgTxt & "Pawel" & "<br>"
+
+        oMail.HTMLBody = MsgTxt & oMail.HTMLBody
+        
+        oMail.Display
+        
+ 
+    End If
+  
+ MsgBox "Please customize the message."
+ 
+End Sub
